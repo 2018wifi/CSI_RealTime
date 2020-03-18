@@ -8,10 +8,15 @@ port: 5500
 ## **Header:**
 
 4 bytes: payload starts with four magic bytes 0x11111111
+
 6 bytes: six byte source mac address
+
 2 bytes: two byte sequence number of the Wi-Fi frame
+
 2 bytes: two bytes contain core and spatial stream number(the lowest three bits indicate the core and the next three bits the spatial stream number)
+
 2 bytes: chanspec used during extraction can be found in the subsequent two bytes
+
 2 bytes: two bytes identifying the chip version
 
 ## **CSI(Complex)**
