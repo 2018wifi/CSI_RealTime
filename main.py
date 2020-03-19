@@ -1,7 +1,6 @@
 import threading
 import math
 import csidraw
-import random
 import csi_receive
 import socket
 
@@ -16,11 +15,10 @@ def zlw(lk):
     global matrix
     global magic_1
     PORT = 5500
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    s.bind(('255.255.255.255', PORT))
     while True:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.bind(('255.255.255.255', PORT))
         local_matrix = []
         for i in range(step):
             buffer, address = s.recvfrom(65535)
@@ -31,7 +29,6 @@ def zlw(lk):
             local_matrix.append(local_vector)
         # print(csi)
         # ------这里用邹老板的脚本得到一个local_matrix------ #
-        csi_receive.receive_csi(local_matrix)
         if magic_1 == 0:  # 中转站没货的时候才能往里边存东西
             lk.acquire()
             matrix = local_matrix  # 把matrix锁住后赶紧赋值，然后解锁
@@ -48,7 +45,7 @@ def pcr(lk, bn):
             local_data = processed_data  # 把processed_data锁住后赶紧拷贝，然后解锁
             lk.release()
             for i in local_data:
-                csidraw.real_time_draw(bn, [random.randint(1000, 3000) for j in range(64)])
+                csidraw.real_time_draw(bn, i)
             # csidraw.threeD_draw(local_data)
             magic_2 = 0
 
