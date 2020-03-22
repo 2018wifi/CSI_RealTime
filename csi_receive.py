@@ -26,16 +26,16 @@ def read_header(data):  # 提取头信息
 
     return header
 
-def read_csi(data):     # 提取CSI信息，并转换成矩阵
-    # csi = np.zeros((64,), dtype=np.complex)
+def read_csi(data, NFFT):     # 提取CSI信息，并转换成矩阵
+    csi = np.zeros(NFFT, dtype=np.complex)
     sourceData = data[18:]
     sourceData.dtype = np.int16
     csi_data = sourceData.reshape(-1, 2).tolist()
 
-    # i = 0
-    # for x in csi_data:
-    #     csi[i] = np.complex(x[0], x[1])
-    #     i += 1
+    i = 0
+    for x in csi_data:
+        csi[i] = np.complex(x[0], x[1])
+        i += 1
 
-    return csi_data
+    return csi
 

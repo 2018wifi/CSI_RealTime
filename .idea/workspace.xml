@@ -3,7 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="269160d6-2799-4e6c-9e77-4a98af4a427e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/csi_receive.py" beforeDir="false" afterPath="$PROJECT_DIR$/csi_receive.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="PyScientificConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -120,12 +122,22 @@
       <screen x="0" y="0" width="1549" height="840" />
     </state>
     <state width="1506" height="267" key="GridCell.Tab.1.right/0.0.1549.840@0.0.1549.840" timestamp="1584537457544" />
-    <state x="0" y="63" key="SettingsEditor" timestamp="1584524936662">
-      <screen x="0" y="0" width="1549" height="840" />
+    <state x="90" y="65" key="SettingsEditor" timestamp="1584870613099">
+      <screen x="90" y="0" width="1446" height="864" />
     </state>
     <state x="0" y="63" key="SettingsEditor/0.0.1549.840@0.0.1549.840" timestamp="1584524936662" />
+    <state x="90" y="65" key="SettingsEditor/90.0.1446.864@90.0.1446.864" timestamp="1584870613099" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/csi_receive.py</url>
+          <line>1</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="matrix" language="Python" />
