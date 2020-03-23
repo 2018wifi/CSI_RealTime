@@ -2,7 +2,24 @@
 import socket
 import struct
 import numpy as np
+from glovar import *
 
+PORT = 5500
+
+
+def get_bn(count):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    s.bind(('255.255.255.255', PORT))
+
+    bn_matrix = np.zeros((count, NFFT), dtype=np.complex)
+    for i in range(count):
+        buffer, _ = s.recvfrom(65535)
+        # print('Server received from {}:{}'.format(address, buffer))
+        data = parse(buffer)
+        local_vector = read_csi(data)
+        bn_matrix[i]=local_vector
+    return bn_matrix
 
 def parse(buffer):      # 解析二进制流
     nbyte = int(len(buffer))        # 字节数
@@ -27,15 +44,15 @@ def read_header(data):  # 提取头信息
     return header
 
 def read_csi(data):     # 提取CSI信息，并转换成矩阵
-    # csi = np.zeros((64,), dtype=np.complex)
+    csi = np.zeros(NFFT, dtype=np.complex)
     sourceData = data[18:]
     sourceData.dtype = np.int16
     csi_data = sourceData.reshape(-1, 2).tolist()
 
-    # i = 0
-    # for x in csi_data:
-    #     csi[i] = np.complex(x[0], x[1])
-    #     i += 1
+    i = 0
+    for x in csi_data:
+        csi[i] = np.complex(x[0], x[1])
+        i += 1
 
-    return csi_data
+    return csi
 

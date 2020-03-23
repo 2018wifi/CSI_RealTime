@@ -1,97 +1,83 @@
-import threading
+# coding=utf-8
 import math
+import socket
+import threading
+import numpy as np
+from copy import deepcopy
+
 import csidraw
 import csi_receive
-import socket
+from glovar import *    # 配置文件
 
-step = 1  # 步长
-matrix = [[[0, 0] for i in range(64)] for i in range(step)]  # 从邹老板那里读到的复数矩阵
-processed_data = [[0 for i in range(64)] for i in range(step)]  # 处理过后交给彭老板的幅值矩阵
+
+matrix = np.zeros((step, NFFT), dtype=np.complex)   # 子载波数×步长
+processed_matrix = np.zeros((step, NFFT), dtype=np.complex)   # 处理过后的幅值矩阵
 magic_1 = 0
 magic_2 = 0
-NFFT = 64
-
-def zlw(lk):
-    global matrix
-    global magic_1
-    PORT = 5500
-    while True:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.bind(('255.255.255.255', PORT))
-        local_matrix = []
-        for i in range(step):
-            buffer, address = s.recvfrom(65535)
-            print('Server received from {}:{}'.format(address, buffer))
-            data = csi_receive.parse(buffer)
-            # header = read_header(data)
-            local_vector = csi_receive.read_csi(data)
-            local_matrix.append(local_vector)
-        # print(csi)
-        # ------这里用邹老板的脚本得到一个local_matrix------ #
-        if magic_1 == 0:  # 中转站没货的时候才能往里边存东西
-            lk.acquire()
-            matrix = local_matrix  # 把matrix锁住后赶紧赋值，然后解锁
-            lk.release()
-            magic_1 = 1  # 中转站此时又有货了
-
-
-def pcr(lk, bn):
-    global processed_data
-    global magic_2
-    while True:
-        if magic_2 == 1:  # 中转站有货才能画图
-            lk.acquire()
-            local_data = processed_data  # 把processed_data锁住后赶紧拷贝，然后解锁
-            lk.release()
-            for i in local_data:
-                csidraw.real_time_draw(bn, i)
-            # csidraw.threeD_draw(local_data)
-            magic_2 = 0
 
 
 class CSI:
     def __init__(self, bn_file):  # 读入底噪
         self.bn_file = bn_file
-        file = open(self.bn_file, mode='r')
-        self.background_noise = list(float(i.strip('\n')) for i in file.readlines())
-        file.close()
+        self.background_noise = np.loadtxt(self.bn_file)
         # print(self.background_noise)
 
     def update_bn(self, new_bn):  # 更新底噪
-        file = open(self.bn_file, mode='w')
-        for i in new_bn:
-            self.background_noise = file.write(str(i) + '\n')
-        file.close()
+        np.savetxt(self.bn_file, new_bn)
 
-    def processing(self, lk):
+    def get_csi(self, lk):
         global matrix
-        global processed_data
+        global magic_1
+
+        PORT = 5500
+        while True:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            s.bind(('255.255.255.255', PORT))
+            
+            local_matrix = np.zeros((step, NFFT), dtype=np.complex)
+            for i in range(step):
+                buffer, address = s.recvfrom(65535)
+                print('Server received from {}:{}'.format(address, buffer))
+                data = csi_receive.parse(buffer)
+                local_vector = csi_receive.read_csi(data)
+                local_matrix[i] = local_vector
+            # print(local_matrix)
+            if magic_1 == 0:  # 状态为等待接收时传入数据
+                lk.acquire()
+                matrix = local_matrix  # 赋值给matrix
+                magic_1 = 1  # 转入状态1，等待处理
+                lk.release()
+
+    def process(self, lk):
+        global matrix
+        global processed_matrix
         global magic_1
         global magic_2
+
         while True:
-            if magic_1 == 1:  # 邹老板中转站有货的时候把货取出来
-                # print(matrix)
+            if magic_1 == 1:  # 状态为待处理时进行处理
                 lk.acquire()
                 local_matrix = matrix
+                magic_1 = 0  # 转入状态0，等待接收
                 lk.release()
-                magic_1 = 0  # 告诉邹老板货已经拿走了
-                local_data = [[0 for i in range(NFFT)] for i in range(step)]
-                for i in range(step):
-                    for j in range(NFFT):
-                        local_data[i][j] = math.sqrt(local_matrix[i][j][0] ** 2 + local_matrix[i][j][1] ** 2)
-                if magic_2 == 0:  # 彭老板中转站没货时补货
-                    lk.acquire()
-                    processed_data = local_data  # 为彭老板中转站放入加工好的货物
-                    lk.release()
-                    magic_2 = 1  # 告诉彭老板货物已经放好了
+                processed_matrix = np.abs(local_matrix)
+
+    def plot(self, lk):
+        global processed_matrix
+        global magic_2
+
+        while True:
+            local_matrix = processed_matrix
+            for local_vector in local_matrix:
+                csidraw.real_time_draw(self.background_noise, local_vector)
 
     def work(self):  # 多线程工作
         lock = threading.Lock()
-        get_t = threading.Thread(target=zlw, args=(lock,))
-        process_t = threading.Thread(target=self.processing, args=(lock,))
-        print(self.background_noise)
-        plot_t = threading.Thread(target=pcr, args=(lock, self.background_noise))
+        get_t = threading.Thread(target=self.get_csi, args=(lock,))
+        process_t = threading.Thread(target=self.process, args=(lock,))
+        # print(self.background_noise)
+        plot_t = threading.Thread(target=self.plot, args=(lock,))
         get_t.start()
         process_t.start()
         plot_t.start()
@@ -101,7 +87,6 @@ class CSI:
 
 
 if __name__ == '__main__':
-    csi = CSI('test.txt')
-    # print(matrix)
+    csi = CSI('noise.txt')
     # csi.update_bn([100 for i in range(NFFT)])
     csi.work()
