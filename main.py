@@ -40,7 +40,7 @@ class CSI:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             s.bind(('255.255.255.255', PORT))
             
-            local_matrix = np.zeros((NFFT, step), dtype=np.complex)
+            local_matrix = np.zeros((step, NFFT), dtype=np.complex)
             for i in range(step):
                 buffer, address = s.recvfrom(65535)
                 # print('Server received from {}:{}'.format(address, buffer))
