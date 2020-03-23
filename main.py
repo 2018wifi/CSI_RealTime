@@ -75,7 +75,7 @@ class CSI:
         while True:
             local_matrix = processed_matrix
             for local_vector in local_matrix:
-                csidraw.real_time_draw(self.background_noise, local_vector.tolist())
+                csidraw.real_time_draw(self.background_noise, local_vector)
 
     def work(self):  # 多线程工作
         lock = threading.Lock()
