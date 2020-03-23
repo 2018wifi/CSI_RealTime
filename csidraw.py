@@ -5,10 +5,16 @@ from glovar import *
 from mpl_toolkits.mplot3d import Axes3D
 
 '''定义参数'''
-ax = [i for i in range(NFFT)]  # 定义一个 x 轴的空列表
+ax = [i for i in range(-32, (NFFT / 2) - 1)]  # 定义一个 x 轴的空列表
 
 
 def real_time_draw(ay1, ay2):
+    ay1 = ay1[0:32] + ay1[32:64]       # 将子载波对位以及将部分无效子载波归零
+    ay2 = ay2[:, 0:32] + ay2[:, 32:64]
+    for i in [0, 1, 2, 3, 32, 61, 62, 63]:
+        ay1[i] = 0
+        ay2[:, i] = 0
+
     plt.clf()  # 清除之前画的图
     plt.ylabel('SNR')
     plt.xlabel('Subcarrier')
