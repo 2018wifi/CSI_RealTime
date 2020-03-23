@@ -1,18 +1,17 @@
-import threading
+# coding=utf-8
 import math
+import socket
+import threading
+import numpy as np
+from copy import deepcopy
+
 import csidraw
 import csi_receive
-import socket
-import numpy as np
-from copy import deepcopy()
+from glovar import *    # 配置文件
 
-BW = 20     # 带宽
-NFFT = BW * 3.2 # 子载波数
-step = 1  # 步长
-matrix = np.zeros((NFFT, step), dtype=np.complex)   # 子载波数×步长
-processed_matrix = np.zeros((NFFT, step), dtype=np.complex)   # 处理过后的幅值矩阵
-# matrix = [[[0, 0] for i in range(64)] for i in range(step)]  # 从邹老板那里读到的复数矩阵
-# processed_data = [[0 for i in range(64)] for i in range(step)]  # 处理过后交给彭老板的幅值矩阵
+
+matrix = np.zeros((step, NFFT), dtype=np.complex)   # 子载波数×步长
+processed_matrix = np.zeros((step, NFFT), dtype=np.complex)   # 处理过后的幅值矩阵
 magic_1 = 0
 magic_2 = 0
 
@@ -41,7 +40,7 @@ class CSI:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             s.bind(('255.255.255.255', PORT))
             
-            local_matrix = np.zeros((NFFT, step), dtype)
+            local_matrix = np.zeros((NFFT, step), dtype=np.complex)
             for i in range(step):
                 buffer, address = s.recvfrom(65535)
                 # print('Server received from {}:{}'.format(address, buffer))
@@ -81,7 +80,7 @@ class CSI:
     def work(self):  # 多线程工作
         lock = threading.Lock()
         get_t = threading.Thread(target=self.get_csi, args=(lock,))
-        process_t = threading.Thread(target=self.processing, args=(lock,))
+        process_t = threading.Thread(target=self.process, args=(lock,))
         # print(self.background_noise)
         plot_t = threading.Thread(target=self.plot, args=(lock,))
         get_t.start()

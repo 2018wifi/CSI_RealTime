@@ -1,14 +1,11 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import random
+import numpy as np
+import matplotlib.pyplot as plt
+from glovar import *
 from mpl_toolkits.mplot3d import Axes3D
 
 '''定义参数'''
-MAX = 10  # 实时显示数量最大值
-BM = 20  # 带宽大小
-NFFT = int(BM * 3.2)
 ax = [i for i in range(NFFT)]  # 定义一个 x 轴的空列表
-
 
 
 def real_time_draw(ay1, ay2):

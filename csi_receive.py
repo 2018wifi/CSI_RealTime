@@ -3,6 +3,24 @@ import socket
 import struct
 import numpy as np
 
+PORT = 5500
+
+
+def get_csi(count):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    s.bind(('255.255.255.255', PORT))
+
+    matrix = np.zeros((count, NFFT))
+    for _ in count:
+
+        buffer, address = s.recvfrom(65535)
+
+
+        print('Server received from {}:{}'.format(address, buffer))
+        data = parse(buffer)
+        local_vector = csi_receive.read_csi(data)
+        local_matrix.append(local_vector)
 
 def parse(buffer):      # 解析二进制流
     nbyte = int(len(buffer))        # 字节数

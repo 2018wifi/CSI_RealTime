@@ -7,16 +7,7 @@ csi = CSI('test.txt')
 PORT = 5500
 local_matrix = []
 for i in range(100):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    s.bind(('255.255.255.255', PORT))
-    local_matrix = []
-    buffer, address = s.recvfrom(65535)
-    print('Server received from {}:{}'.format(address, buffer))
-    data = csi_receive.parse(buffer)
-    # header = read_header(data)
-    local_vector = csi_receive.read_csi(data)
-    local_matrix.append(local_vector)
+
 temp_bn = [[0 for i in range(len(local_vector))]for j in range(len(local_matrix))]
 for i in range(len(local_matrix)):
     for j in range(len(local_vector)):
