@@ -12,13 +12,13 @@ def get_bn(count):
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     s.bind(('255.255.255.255', PORT))
 
-    bn_matrix = np.zeros((count))
+    bn_matrix = np.zeros((count, NFFT), dtype=np.complex)
     for i in range(count):
         buffer, _ = s.recvfrom(65535)
         # print('Server received from {}:{}'.format(address, buffer))
         data = parse(buffer)
         local_vector = read_csi(data)
-        bn_matrix[i](local_vector)
+        bn_matrix[i]=local_vector
     return bn_matrix
 
 def parse(buffer):      # 解析二进制流

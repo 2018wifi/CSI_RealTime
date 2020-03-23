@@ -38,11 +38,11 @@ class CSI:
             local_matrix = np.zeros((step, NFFT), dtype=np.complex)
             for i in range(step):
                 buffer, address = s.recvfrom(65535)
-                # print('Server received from {}:{}'.format(address, buffer))
+                print('Server received from {}:{}'.format(address, buffer))
                 data = csi_receive.parse(buffer)
                 local_vector = csi_receive.read_csi(data)
                 local_matrix[i] = local_vector
-            print(local_matrix)
+            # print(local_matrix)
             if magic_1 == 0:  # 状态为等待接收时传入数据
                 lk.acquire()
                 matrix = local_matrix  # 赋值给matrix
