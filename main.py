@@ -19,16 +19,11 @@ magic_2 = 0
 class CSI:
     def __init__(self, bn_file):  # 读入底噪
         self.bn_file = bn_file
-        file = open(self.bn_file, mode='r')
-        self.background_noise = list(float(i.strip('\n')) for i in file.readlines())
-        file.close()
+        self.background_noise = np.loadtxt(self.bn_file)
         # print(self.background_noise)
 
     def update_bn(self, new_bn):  # 更新底噪
-        file = open(self.bn_file, mode='w')
-        for i in new_bn:
-            self.background_noise = file.write(str(i) + '\n')
-        file.close()
+        np.savetxt(self.bn_file, new_bn)
 
     def get_csi(self, lk):
         global matrix
@@ -45,7 +40,7 @@ class CSI:
                 buffer, address = s.recvfrom(65535)
                 # print('Server received from {}:{}'.format(address, buffer))
                 data = csi_receive.parse(buffer)
-                local_vector = csi_receive.read_csi(data, NFFT)
+                local_vector = csi_receive.read_csi(data)
                 local_matrix[i] = local_vector
             print(local_matrix)
             if magic_1 == 0:  # 状态为等待接收时传入数据

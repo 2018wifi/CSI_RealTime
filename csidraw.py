@@ -13,12 +13,9 @@ def real_time_draw(ay1, ay2):
     plt.ylabel('SNR')
     plt.xlabel('Subcarrier')
     plt.xlim(0, NFFT)
-    # plt.ylim(0,8000)
     plt.plot(ax, ay1, 'red')  # 初始状态的图
     plt.plot(ax, ay2, 'cyan')  # 当前状态
-    ay3 = []
-    for i in range(NFFT):
-        ay3.append(ay2[i] - ay1[i])
+    ay3 = ay2 - ay1
     plt.plot(ax, ay3, 'b')  # 差值
     plt.pause(0.001)  # 暂停
     # plt.show()
