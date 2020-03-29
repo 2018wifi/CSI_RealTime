@@ -1,4 +1,5 @@
 # coding=utf-8
+import sys
 import socket
 import struct
 import numpy as np
@@ -20,6 +21,10 @@ def get_bn(count):
         local_vector = read_csi(data)
         bn_matrix[i]=local_vector
     return bn_matrix
+
+def get_csi_local(count):
+    matrix = get_bn(count)
+    np.save(matrix)
 
 def parse(buffer):      # 解析二进制流
     nbyte = int(len(buffer))        # 字节数
@@ -56,3 +61,5 @@ def read_csi(data):     # 提取CSI信息，并转换成矩阵
 
     return csi
 
+if __name__ == '__main__':
+    get_csi_local(sys.argv[1])
