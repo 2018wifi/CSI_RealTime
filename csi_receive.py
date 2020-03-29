@@ -22,9 +22,9 @@ def get_bn(count):
         bn_matrix[i]=local_vector
     return bn_matrix
 
-def get_csi_local(count):
+def get_csi_local(count, filename):
     matrix = get_bn(count)
-    np.save(matrix)
+    np.save(filename, matrix)
 
 def parse(buffer):      # 解析二进制流
     nbyte = int(len(buffer))        # 字节数
@@ -62,4 +62,4 @@ def read_csi(data):     # 提取CSI信息，并转换成矩阵
     return csi
 
 if __name__ == '__main__':
-    get_csi_local(sys.argv[1])
+    get_csi_local(int(sys.argv[1]), sys.argv[2])
